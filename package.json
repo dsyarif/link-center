@@ -1,0 +1,9 @@
+{
+  "name": "link-center-perencanaan",
+  "version": "1.0.0",
+  "description": "Direktori link untuk Sub Bidang Renval BKPSDM Kota Pekalongan",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

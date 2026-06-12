@@ -1,0 +1,50 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "12345"
+  },
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "Aplikasi Perencanaan",
+      "links": [
+        {
+          "id": "link-1",
+          "title": "SIPD RI",
+          "url": "https://sipd.kemendagri.go.id",
+          "desc": "Sistem Informasi Pemerintahan Daerah"
+        },
+        {
+          "id": "link-2",
+          "title": "e-Walidata Bappenas",
+          "url": "https://ewalidata.bappenas.go.id",
+          "desc": "Data perencanaan pembangunan nasional"
+        }
+      ]
+    },
+    {
+      "id": "cat-2",
+      "name": "Kepegawaian (BKPSDM)",
+      "links": [
+        {
+          "id": "link-3",
+          "title": "SIASN BKN",
+          "url": "https://siasn.bkn.go.id",
+          "desc": "Sistem Informasi ASN"
+        }
+      ]
+    },
+    {
+      "id": "cat-3",
+      "name": "Referensi & Regulasi",
+      "links": [
+        {
+          "id": "link-4",
+          "title": "JDIH Kota Pekalongan",
+          "url": "https://jdih.pekalongankota.go.id",
+          "desc": "Jaringan Dokumentasi dan Informasi Hukum"
+        }
+      ]
+    }
+  ]
+}
