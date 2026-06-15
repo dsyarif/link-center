@@ -1,17 +1,19 @@
-# Link Center Perencanaan
+# Link Center Perencanaan — v2 (Penyimpanan Permanen)
 
-Direktori link internal untuk Sub Bidang Renval, BKPSDM Kota Pekalongan.
-Dibangun dengan HTML, CSS, dan JavaScript murni (tanpa framework), data
-disimpan dalam format JSON.
+Direktori link internal Sub Bidang Renval, BKPSDM Kota Pekalongan.
+Versi ini menggunakan **JSONBin.io** sebagai database permanen — data
+tidak hilang walau Vercel restart, redeploy, atau cold start sekalipun.
+
+---
 
 ## Struktur Project
 
 ```
 link-center/
 ├── api/
-│   └── links.js        # Serverless function (CRUD + login)
+│   └── links.js        # Serverless function (CRUD + login) → JSONBin
 ├── data/
-│   └── links.json       # "Database" JSON awal (kategori, link, akun admin)
+│   └── links.json      # Data awal (dipakai saat setup + dev lokal)
 ├── public/
 │   ├── index.html
 │   ├── css/style.css
@@ -20,96 +22,79 @@ link-center/
 └── vercel.json
 ```
 
-## Fitur
+---
 
-- **Tanpa login**: pengguna umum bisa melihat & membuka semua link.
-- **Login admin**: tombol "Login Admin" di kanan atas.
-  - Username default: `admin`
-  - Password default: `renval2026`
-  - **Segera ganti** kredensial ini di `data/links.json` sebelum deploy.
-- **Admin bisa**:
-  - Tambah kategori baru
-  - Hapus kategori
-  - Tambah / edit / hapus link dalam kategori
-- **Pencarian** real-time berdasarkan judul, deskripsi, URL, atau nama kategori.
+## Setup Langkah demi Langkah
 
-## ⚠️ Catatan Penting: Penyimpanan Data di Vercel
+### Langkah 1 — Buat akun JSONBin.io (gratis)
 
-Vercel menjalankan serverless function pada filesystem **read-only**,
-kecuali folder `/tmp` yang bersifat **sementara** (akan reset saat function
-"cold start" ulang / redeploy).
+1. Buka https://jsonbin.io → klik **Sign Up** (bisa pakai Google).
+2. Setelah masuk, klik **+ Create Bin** (tombol biru di kiri atas).
+3. Di editor yang muncul, **hapus isi defaultnya**, lalu paste seluruh isi
+   file `data/links.json` dari project ini.
+4. Klik **Save** → akan muncul URL seperti:
+   `https://api.jsonbin.io/v3/b/6650abc123def456`
+5. **Salin BIN ID**-nya (bagian terakhir URL: `6650abc123def456`).
 
-Artinya:
-- Perubahan data (tambah/edit/hapus link & kategori) akan **tersimpan
-  sementara** selama instance function masih aktif (biasanya beberapa menit
-  hingga jam), tapi **tidak permanen** secara default.
-- Untuk penyimpanan **permanen**, disarankan salah satu opsi berikut:
+### Langkah 2 — Buat API Key JSONBin
 
-### Opsi A — Paling Sederhana: Edit manual + redeploy
-Edit `data/links.json` secara manual lalu push ke GitHub. Vercel akan
-otomatis redeploy. Cocok jika perubahan link tidak terlalu sering.
+1. Di dashboard JSONBin, klik ikon profil (kanan atas) → **API Keys**.
+2. Klik **+ Create Key** → beri nama misal `link-center` → **Save**.
+3. **Salin Master Key** yang muncul (mulai dengan `$2b$...`).
 
-### Opsi B — Gunakan Vercel KV / Edge Config / database eksternal
-Untuk perubahan yang sering (via tombol admin di web), ganti fungsi
-`readData()` dan `writeData()` di `api/links.js` agar membaca/menulis ke:
-- [Vercel KV](https://vercel.com/docs/storage/vercel-kv) (Redis), atau
-- [Vercel Edge Config](https://vercel.com/docs/storage/edge-config), atau
-- Database lain (Supabase, MongoDB Atlas, dll).
+### Langkah 3 — Tambahkan Environment Variables di Vercel
 
-Struktur data JSON yang dipakai tetap sama, sehingga migrasi cukup mengganti
-2 fungsi tersebut.
+1. Buka dashboard Vercel → pilih project **link-center-perencanaan**.
+2. Klik **Settings** → **Environment Variables**.
+3. Tambahkan dua variabel berikut:
 
-### Opsi C — Jalankan di server Node sendiri (bukan serverless)
-Jika dijalankan di VPS / server kantor dengan Node.js biasa (bukan di
-Vercel), filesystem bersifat permanen — `data/links.json` bisa langsung
-ditulis tanpa masalah. Cukup jalankan:
+   | Name                | Value                        |
+   |---------------------|------------------------------|
+   | `JSONBIN_BIN_ID`    | BIN ID dari Langkah 1        |
+   | `JSONBIN_API_KEY`   | Master Key dari Langkah 2    |
 
-```bash
-node api/links.js  # atau gunakan Express sebagai wrapper
+4. Pastikan centang **Production**, **Preview**, dan **Development**.
+5. Klik **Save** → lalu klik **Deployments** → **Redeploy** (deploy ulang
+   agar env variable aktif).
+
+### Langkah 4 — Selesai!
+
+Sekarang semua perubahan data (tambah/edit/hapus link & kategori) tersimpan
+permanen di JSONBin dan tidak akan hilang.
+
+---
+
+## Kredensial Admin Default
+
+```
+Username : admin
+Password : renval2026
 ```
 
-dan arahkan folder `public/` sebagai static file server.
+**Ganti sebelum deploy!** Edit di `data/links.json` bagian `"admin": { ... }`,
+lalu update juga isi Bin di JSONBin.io agar sinkron.
 
-## Cara Deploy ke Vercel
+---
 
-1. Push folder ini ke repository GitHub.
-2. Buka [vercel.com](https://vercel.com), klik **Add New Project**, pilih
-   repository tersebut.
-3. Vercel otomatis mendeteksi:
-   - `public/` sebagai folder static
-   - `api/links.js` sebagai serverless function di `/api/links`
-4. Klik **Deploy**.
-5. Setelah deploy selesai, buka URL yang diberikan. Login admin menggunakan
-   kredensial di `data/links.json` (ganti dulu sebelum deploy!).
-
-## Menjalankan Secara Lokal
-
-Gunakan [Vercel CLI](https://vercel.com/docs/cli):
+## Development Lokal
 
 ```bash
 npm install -g vercel
 vercel dev
 ```
 
-Lalu buka `http://localhost:3000`.
+Saat development lokal tanpa env variable, aplikasi otomatis fallback membaca
+dari `data/links.json` di lokal (write juga ke file lokal). Cocok untuk
+mengembangkan tanpa menyentuh data production.
 
-## Mengganti Kredensial Admin
+---
 
-Edit `data/links.json`:
+## Limit Gratis JSONBin.io
 
-```json
-{
-  "admin": {
-    "username": "username_baru",
-    "password": "password_baru"
-  },
-  ...
-}
-```
+| Item              | Gratis           |
+|-------------------|------------------|
+| Requests per bulan| 10.000           |
+| Ukuran data       | max 512 KB / Bin |
+| Jumlah Bin        | Tidak terbatas   |
 
-## Kustomisasi Tampilan
-
-- Warna & font diatur via CSS variables di awal `public/css/style.css`
-  (`:root { ... }`).
-- Font yang dipakai: **Fraunces** (judul) dan **Inter** (teks), dimuat dari
-  Google Fonts.
+Untuk penggunaan internal kantor, limit ini lebih dari cukup.
